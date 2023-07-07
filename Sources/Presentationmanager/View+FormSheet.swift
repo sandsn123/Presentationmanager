@@ -26,6 +26,11 @@ class ModalUIHostingController<Content>: UIHostingController<Content> where Cont
         
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .clear
+    }
+    
     deinit {
         print("ModalUIHostingController deinit")
     }
@@ -63,6 +68,11 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
         guard !hostVC.isBeingDismissed else { return }
         hostVC.dismiss(animated: true)
         hostVC.removeFromParent()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .clear
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -104,6 +114,7 @@ struct FormSheet<Content: View> : UIViewControllerRepresentable {
         }
         
         let vc = ModalUIViewController(presentationManager: presentationManager, isPresented: show, onDismiss: onDismiss, content: content)
+        vc.view.backgroundColor = .clear
         return vc
     }
     
