@@ -60,7 +60,7 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
     }
     
     func show() {
-        guard isViewDidAppear else { return }
+        guard isViewDidAppear, self.presentedViewController == nil else { return }
         present(hostVC, animated: true)
     }
     
