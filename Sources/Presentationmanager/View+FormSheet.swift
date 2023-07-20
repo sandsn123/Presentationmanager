@@ -42,7 +42,7 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
     var presentationManager: PresentationManager
     var content: () -> Content
     var onDismiss: (() -> Void)
-    private var hostVC: ModalUIHostingController<Content>
+    private weak var hostVC: ModalUIHostingController<Content>?
     
     private var isViewDidAppear = false
     
@@ -53,18 +53,21 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
         self.onDismiss = onDismiss
         self.presentationManager = presentationManager
         self.content = content
-        self.hostVC = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
-
+        let hostVc = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
+        self.hostVC = hostVc
+        
         super.init(nibName: nil, bundle: nil)
         presentationManager.delegate = self
+        self.addChild(hostVc)
     }
     
     func show() {
-        guard isViewDidAppear, self.presentedViewController == nil else { return }
+        guard let hostVC, isViewDidAppear, self.presentedViewController == nil else { return }
         present(hostVC, animated: true)
     }
     
     func hide() {
+        guard let hostVC else { return }
         guard !hostVC.isBeingDismissed else { return }
         hostVC.dismiss(animated: true)
         hostVC.removeFromParent()
