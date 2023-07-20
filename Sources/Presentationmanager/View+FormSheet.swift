@@ -42,7 +42,7 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
     var presentationManager: PresentationManager
     var content: () -> Content
     var onDismiss: (() -> Void)
-    private weak var hostVC: ModalUIHostingController<Content>?
+    private var hostVC: ModalUIHostingController<Content>
     
     private var isViewDidAppear = false
     
@@ -53,22 +53,18 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
         self.onDismiss = onDismiss
         self.presentationManager = presentationManager
         self.content = content
-        
+        self.hostVC = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
+
         super.init(nibName: nil, bundle: nil)
         presentationManager.delegate = self
-        
-        let hostVc = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
-        self.hostVC = hostVc
-        self.addChild(hostVc)
     }
     
     func show() {
-        guard let hostVC, isViewDidAppear, self.presentedViewController == nil else { return }
+        guard isViewDidAppear, self.presentedViewController == nil else { return }
         present(hostVC, animated: true)
     }
     
     func hide() {
-        guard let hostVC else { return }
         guard !hostVC.isBeingDismissed else { return }
         hostVC.dismiss(animated: true)
         hostVC.removeFromParent()
@@ -140,8 +136,14 @@ extension View {
                                          presentationManager: PresentationManager,
                                          @ViewBuilder content: @escaping () -> Content) -> some View {
         self.background(
-            FormSheet(show: isPresented, presentationManager: presentationManager,
-                              content: content)
+            Group {
+                if isPresented.wrappedValue {
+                    FormSheet(show: isPresented, presentationManager: presentationManager,
+                                      content: content)
+                } else {
+                    Color.clear
+                }
+            }
          )
     }
 }
