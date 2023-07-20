@@ -53,11 +53,12 @@ class ModalUIViewController<Content: View>: UIViewController, PresentationManage
         self.onDismiss = onDismiss
         self.presentationManager = presentationManager
         self.content = content
-        let hostVc = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
-        self.hostVC = hostVc
         
         super.init(nibName: nil, bundle: nil)
         presentationManager.delegate = self
+        
+        let hostVc = ModalUIHostingController(presentationManager: presentationManager, onDismiss: onDismiss, rootView: content())
+        self.hostVC = hostVc
         self.addChild(hostVc)
     }
     
